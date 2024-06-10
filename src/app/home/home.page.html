@@ -7,7 +7,7 @@
     <ion-searchbar animated="true" placeholder="Search"></ion-searchbar>
     <ion-buttons slot="start">
       <ion-button (click)="toggleView()">
-     
+
         <p>{{ isHomePage ? 'View Favorites' : 'View all' }}</p>
 
       </ion-button>
@@ -31,25 +31,28 @@
         </ion-item-options>
 
         <ion-item>
-          <ion-thumbnail slot="start">
-            <img [src]="item.flag" (error)="onImageError($event)"/>
-          </ion-thumbnail>
+          <ion-avatar slot="start">
+            <img [src]="item.flag" (error)="onImageError($event)" />
+          </ion-avatar>
           <div class="country-details">
             <ion-label class="country-name">
-             {{item.name}}
+              {{item.name}}
             </ion-label>
-            <span (click)="viewMore()">More</span>
-
+            <ion-button fill="clear" slot="end" (click)="viewMore(item)">
+              <ion-icon name="arrow-forward"></ion-icon>
+            </ion-button>
+            <ion-spinner *ngIf="isLoading && loadingItem === item" name="lines"></ion-spinner>
+            <span *ngIf="isLoaded && loadedItem === item">
+               {{  item.population?.value === 0 ? 'Not Found' : item.population?.value?.toLocaleString() }}
+            </span>
           </div>
         </ion-item>
+
+
       </ion-item-sliding>
-
     </ion-item-group>
-
-    
-
-
   </ion-list>
+
   <div class="letter-nav">
     <ion-list>
       <ion-item *ngFor="let letter of letters">
