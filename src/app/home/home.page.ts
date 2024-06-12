@@ -2,13 +2,16 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { arrowForward, heart } from 'ionicons/icons';
+import { arrowForward, heart, heartOutline, trash, trashOutline } from 'ionicons/icons';
 import { CountryService } from '../services/country.service';
 import { Country, GroupedCountry } from '../models/country.model';
 
 
 addIcons({
   'heart': heart,
+  'heart-outline': heartOutline,
+  'trash': trash,
+  'trash-outline': trashOutline,
   'arrow-forward': arrowForward
 });
 
@@ -20,17 +23,21 @@ addIcons({
   imports: [IonicModule, CommonModule],
 })
 export class HomePage implements OnInit {
-  public letters: string[] = [];
+  letters: string[] = [];
 
-  public countries: Country[] = [];
-  public groupedCountries: GroupedCountry = {};
+  countries: Country[] = [];
+  baseCountries: Country[] = [];
+  favourites: Country[] = [];
 
-  public isHomePage: boolean = true;
-  public isLoading: boolean = false;
-  public isLoaded: boolean = false;
+  groupedCountries: GroupedCountry = {};
+  baseBackupGroupedCountries: GroupedCountry = {};
 
-  public loadingItem: Country | null = null;
-  public loadedItem: Country | null = null;
+  isHomePage: boolean = true;
+  isLoading: boolean = false;
+  isLoaded: boolean = false;
+
+  loadingItem: Country | null = null;
+  loadedItem: Country | null = null;
 
 
   constructor(private countryService: CountryService) { }
@@ -39,11 +46,21 @@ export class HomePage implements OnInit {
     this.countryService.getCountries().subscribe(result => {
       if (!result.error) {
         this.countries = result.data;
+        this.baseCountries = result.data;
         this.groupCountries();
         this.createLetters();
       }
     });
+    this.baseBackupGroupedCountries = this.groupedCountries;
+    this.loadFavourites();
   }
+  private loadFavourites() {
+    const storedFavourites = localStorage.getItem('favourites');
+    if (storedFavourites) {
+      this.favourites = JSON.parse(storedFavourites);
+    }
+  }
+
   private groupCountries(): void {
     this.countries.forEach(country => {
       const letter = country.name.charAt(0).toUpperCase();
@@ -59,11 +76,19 @@ export class HomePage implements OnInit {
     this.letters = Object.keys(this.groupedCountries).sort();
   }
 
-  public toggleView(): void {
+  toggleView(): void {
     this.isHomePage = !this.isHomePage;
+    if (!this.isHomePage) {
+      this.groupedCountries = {};
+      this.countries = this.favourites;
+      this.groupCountries();
+    } else {
+      this.groupedCountries = this.baseBackupGroupedCountries;
+    }
+    this.createLetters();
   }
 
-  public viewMore(item: Country): void {
+  viewMore(item: Country): void {
     this.loadingItem = item;
     this.isLoading = true;
 
@@ -86,7 +111,7 @@ export class HomePage implements OnInit {
         error: (e) => {
           console.error('Error fetching population', e);
           item.population = {
-            value : 0
+            value: 0
           };
           this.isLoaded = true
           this.isLoading = false;
@@ -100,7 +125,43 @@ export class HomePage implements OnInit {
       });
     }
   }
-  public onImageError(event: any) {
+  onImageError(event: any): void {
     event.target.src = 'assets/default-flag.png';
   }
+
+  onItemDrag(event: any, item: Country): void {
+    const side: string = event.detail.side;
+    if (side === 'end') {
+      this.favourites = this.favourites.filter(c => c !== item);
+      if (!this.isHomePage) {
+        this.groupedCountries = {};
+        this.countries = this.favourites;
+        this.groupCountries();
+      }
+    } else if (side === 'start') {
+      if (!this.favourites.includes(item))
+        this.favourites.push(item);
+    }
+    localStorage.setItem('favourites', JSON.stringify(this.favourites));
+
+  }
+  scrollToLetter(letter: string): void {
+    const el = document.getElementById(letter);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+  filterCountries(event: any): void {
+    const query: string = event?.target?.value?.toLowerCase();
+
+    if (query && query.trim() !== '') {
+      this.groupedCountries = {};
+      this.countries = this.baseCountries.filter(country => country.name.toLowerCase().indexOf(query) > -1);
+      this.groupCountries();
+    } else {
+      this.groupedCountries = this.baseBackupGroupedCountries;
+    }
+    this.createLetters();
+  }
+
 }
