@@ -25,20 +25,15 @@
       <ion-item-sliding *ngFor="let item of groupedCountries[letter]" (ionSwipe)="onItemDrag($event, item)">
         <ion-item-options side="start">
           <ion-item-option>
-            <ion-icon slot="icon-only" name="heart" color="success" *ngIf="favourites.includes(item)"></ion-icon>
-            <span class="toggle-fav" *ngIf="favourites.includes(item)">Added!</span>
-            <ion-icon slot="icon-only" name="heart-outline" color="success"
-              *ngIf="!favourites.includes(item)"></ion-icon>
-
+            <ion-icon slot="icon-only" [name]="favourites.includes(item)? 'heart' : 'heart-outline'" color="success"></ion-icon>
+            <span class="toggle-fav"> {{favourites.includes(item) ? 'Added!' : 'Not in favorite' }} </span>
           </ion-item-option>
         </ion-item-options>
+
         <ion-item-options side="end">
           <ion-item-option>
-            <ion-icon slot="icon-only" name="trash" color="danger" *ngIf="!favourites.includes(item)"></ion-icon>
-            <span class="toggle-fav" *ngIf="!favourites.includes(item)">Removed!</span>
-            <ion-icon slot="icon-only" name="trash-outline" color="danger"
-              *ngIf="favourites.includes(item)"></ion-icon>
-
+            <ion-icon slot="icon-only" [name]="favourites.includes(item) ? 'trash-outline': 'trash'" color="danger"></ion-icon>
+            <span class="toggle-fav">{{favourites.includes(item) ? 'In favorite' : 'Removed!'}}   </span>
           </ion-item-option>
         </ion-item-options>
 
@@ -47,9 +42,8 @@
             <img [src]="item.flag" (error)="onImageError($event)" />
           </ion-avatar>
           <div class="country-details">
-            <ion-label class="country-name">
-              {{item.name}}
-            </ion-label>
+            <ion-label class="country-name"> {{item.name}} </ion-label>
+
             <ion-button fill="clear" slot="end" (click)="viewMore(item)">
               <ion-icon name="arrow-forward"></ion-icon>
             </ion-button>
@@ -59,8 +53,6 @@
             </span>
           </div>
         </ion-item>
-
-
       </ion-item-sliding>
     </ion-item-group>
   </ion-list>
