@@ -4,7 +4,7 @@
   </ion-toolbar>
 
   <ion-toolbar>
-    <ion-searchbar animated="true" placeholder="Search" (ionInput)="filterCountries($event)"></ion-searchbar>
+    <ion-searchbar #searchBar animated="true" placeholder="Search" (ionInput)="filterCountries($event.target.value)"></ion-searchbar>
     <ion-buttons slot="start">
       <ion-button (click)="toggleView()">
 

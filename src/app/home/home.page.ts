@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { IonicModule, IonSearchbar } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowForward, heart, heartOutline, trash, trashOutline } from 'ionicons/icons';
 import { CountryService } from '../services/country.service';
@@ -23,6 +23,8 @@ addIcons({
   imports: [IonicModule, CommonModule],
 })
 export class HomePage implements OnInit {
+  @ViewChild('searchBar', { static: false }) searchBar!: IonSearchbar;
+
   letters: string[] = [];
 
   countries: Country[] = [];
@@ -76,17 +78,7 @@ export class HomePage implements OnInit {
     this.letters = Object.keys(this.groupedCountries).sort();
   }
 
-  toggleView(): void {
-    this.isHomePage = !this.isHomePage;
-    if (!this.isHomePage) {
-      this.groupedCountries = {};
-      this.countries = this.favourites;
-      this.groupCountries();
-    } else {
-      this.groupedCountries = this.baseBackupGroupedCountries;
-    }
-    this.createLetters();
-  }
+ 
 
   viewMore(item: Country): void {
     this.loadingItem = item;
@@ -137,6 +129,7 @@ export class HomePage implements OnInit {
         this.groupedCountries = {};
         this.countries = this.favourites;
         this.groupCountries();
+        this.createLetters();
       }
     } else if (side === 'start') {
       if (!this.favourites.includes(item))
@@ -151,17 +144,32 @@ export class HomePage implements OnInit {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   }
-  filterCountries(event: any): void {
-    const query: string = event?.target?.value?.toLowerCase();
+  filterCountries(searchBarValue: string|undefined|null): void {
+    const query = searchBarValue?.toLowerCase();
 
     if (query && query.trim() !== '') {
       this.groupedCountries = {};
-      this.countries = this.baseCountries.filter(country => country.name.toLowerCase().indexOf(query) > -1);
+      if (!this.isHomePage) {
+        this.countries = this.favourites.filter(country => country.name.toLowerCase().indexOf(query) > -1);
+      } else {
+        this.countries = this.baseCountries.filter(country => country.name.toLowerCase().indexOf(query) > -1);
+      }
       this.groupCountries();
     } else {
-      this.groupedCountries = this.baseBackupGroupedCountries;
+      if (!this.isHomePage) {
+        this.groupedCountries = {};
+        this.countries = this.favourites;
+        this.groupCountries();
+      } else {
+        this.groupedCountries = this.baseBackupGroupedCountries;
+      }
+
     }
     this.createLetters();
+  }
+  toggleView(): void {
+    this.isHomePage = !this.isHomePage;
+    this.filterCountries(this.searchBar.value);  
   }
 
 }
