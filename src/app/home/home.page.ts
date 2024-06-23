@@ -8,6 +8,7 @@ import { Country, GroupedCountry } from '../models/country.model';
 import { catchError, debounceTime, tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { Constants } from '../models/enums.model';
+import { CountryDetailsComponent } from '../components/country-details/country-details.component';
 
 addIcons({
   'heart': heart,
@@ -21,7 +22,7 @@ addIcons({
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [IonicModule, CommonModule, CountryDetailsComponent]
 })
 export class HomePage {
   @ViewChild('searchBar', { static: false }) searchBar!: IonSearchbar;

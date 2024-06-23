@@ -4,7 +4,8 @@
   </ion-toolbar>
 
   <ion-toolbar>
-    <ion-searchbar #searchBar animated="true" placeholder="Search" (ionInput)="filterCountries($event.target.value)"></ion-searchbar>
+    <ion-searchbar #searchBar animated="true" placeholder="Search"
+      (ionInput)="filterCountries($event.target.value)"></ion-searchbar>
     <ion-buttons slot="start">
       <ion-button (click)="toggleView()">
 
@@ -25,15 +26,17 @@
       <ion-item-sliding *ngFor="let item of groupedCountries[letter]" (ionSwipe)="onItemDrag($event, item)">
         <ion-item-options side="start">
           <ion-item-option>
-            <ion-icon slot="icon-only" [name]="favourites.includes(item)? 'heart' : 'heart-outline'" color="success"></ion-icon>
+            <ion-icon slot="icon-only" [name]="favourites.includes(item)? 'heart' : 'heart-outline'"
+              color="success"></ion-icon>
             <span class="toggle-fav"> {{favourites.includes(item) ? 'Added!' : 'Not in favorite' }} </span>
           </ion-item-option>
         </ion-item-options>
 
         <ion-item-options side="end">
           <ion-item-option>
-            <ion-icon slot="icon-only" [name]="favourites.includes(item) ? 'trash-outline': 'trash'" color="danger"></ion-icon>
-            <span class="toggle-fav">{{favourites.includes(item) ? 'In favorite' : 'Removed!'}}   </span>
+            <ion-icon slot="icon-only" [name]="favourites.includes(item) ? 'trash-outline': 'trash'"
+              color="danger"></ion-icon>
+            <span class="toggle-fav">{{favourites.includes(item) ? 'In favorite' : 'Removed!'}} </span>
           </ion-item-option>
         </ion-item-options>
 
@@ -41,13 +44,10 @@
           <ion-avatar slot="start">
             <ion-img [src]="item?.flag" (ionError)="onImageError($event)"></ion-img>
           </ion-avatar>
-          <div class="country-details">
-            <ion-label class="country-name"> {{item?.name}} </ion-label>
-            <ion-spinner *ngIf="isLoading && loadingItem === item" name="lines"></ion-spinner>
-            <span *ngIf="isLoaded && loadedItem === item">
-              : {{ item.population?.value === 0 ? 'Not Found' : item.population?.value?.toLocaleString() }}
-            </span>
-          </div>
+          <country-details [item]="item" [isLoading]="isLoading" [loadingItem]="loadingItem" [isLoaded]="isLoaded"
+            [loadedItem]="loadedItem">
+          </country-details>
+
         </ion-item>
       </ion-item-sliding>
     </ion-item-group>
