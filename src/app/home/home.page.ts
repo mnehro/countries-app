@@ -85,7 +85,7 @@ export class HomePage {
   }
 
   private createLetters() {
-    this.letters = Object.keys(this.groupedCountries).sort();
+    this.letters = Object.keys(this.groupedCountries || {}).sort();
   }
 
   private updatedLoadingState(item: Country): void {
