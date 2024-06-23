@@ -124,14 +124,10 @@ export class HomePage {
   }
 
   filterCountries(searchBarValue: string | undefined | null): void {
-    const query = searchBarValue?.toLowerCase().trim();
-    if (query && query !== '') {
-      this.countries = this.isHomePage ? this.baseCountries.filter(country => country.name.toLowerCase().indexOf(query) > -1)
-        : this.favourites.filter(country => country.name.toLowerCase().indexOf(query) > -1);
-      this.groupCountries();
-    } else {
-      this.updateView();
-    }
+    const query = (searchBarValue ?? '').toLowerCase().trim();    
+    this.countries = this.isHomePage ? this.baseCountries.filter(country => country.name.toLowerCase().indexOf(query) > -1)
+      : this.favourites.filter(country => country.name.toLowerCase().indexOf(query) > -1);
+    this.groupCountries();
     this.createLetters();
   }
 
