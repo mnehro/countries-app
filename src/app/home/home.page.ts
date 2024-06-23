@@ -107,8 +107,7 @@ export class HomePage {
   }
 
   private addToFavorites(item: Country): void {
-    if (!this.favourites.includes(item))
-      this.favourites.push(item);
+    !this.favourites.includes(item) && this.favourites.push(item);
   }
 
   private removeFromFavorites(item: Country): void {
