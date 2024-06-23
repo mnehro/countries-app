@@ -127,7 +127,7 @@ export class HomePage {
   }
 
   toggleView(): void {
-    this.isHomePage = !this.isHomePage;
+    this.isHomePage = !this.isHomePage ?? false;
     this.filterCountries(this.searchBar.value);
   }
 
