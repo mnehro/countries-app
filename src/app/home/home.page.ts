@@ -134,7 +134,7 @@ export class HomePage {
 
   toggleView(): void {
     this.isHomePage = !this.isHomePage ?? false;
-    this.filterCountries(this.searchBar.value);
+    this.filterCountries(this.searchBar?.value);
   }
 
   viewMore(item: Country): void {
