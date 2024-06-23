@@ -1,7 +1,14 @@
-<div class="country-details">
-  <ion-label class="country-name"> {{item?.name}} </ion-label>
-  <ion-spinner *ngIf="isLoading && loadingItem === item" name="lines"></ion-spinner>
-  <span *ngIf="isLoaded && loadedItem === item">
-    : {{ item.population?.value === 0 ? 'Not Found' : item.population?.value?.toLocaleString() }}
-  </span>
-</div>
+
+<ion-grid>
+  <ion-row>
+ 
+    <ion-col>
+      <ion-label> {{item?.name}}  </ion-label>
+      <ion-spinner *ngIf="isLoading && loadingItem === item" name="lines"></ion-spinner>
+    </ion-col>
+
+    <ion-col>
+      <ion-label *ngIf="isLoaded && loadedItem === item">   {{ item.population?.value === 0 ? 'Not Found' : item.population?.value?.toLocaleString() }} </ion-label>
+    </ion-col>
+  </ion-row>
+</ion-grid>

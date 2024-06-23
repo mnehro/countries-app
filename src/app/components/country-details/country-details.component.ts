@@ -17,5 +17,4 @@ export class CountryDetailsComponent {
   @Input() loadingItem: Country | null = null;
   @Input() isLoaded: boolean = false;
   @Input() loadedItem: Country | null = null;
-
 }
