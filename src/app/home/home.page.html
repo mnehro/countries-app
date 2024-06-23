@@ -37,19 +37,15 @@
           </ion-item-option>
         </ion-item-options>
 
-        <ion-item>
+        <ion-item (click)="viewMore(item)">
           <ion-avatar slot="start">
             <img [src]="item.flag" (error)="onImageError($event)" />
           </ion-avatar>
           <div class="country-details">
             <ion-label class="country-name"> {{item.name}} </ion-label>
-
-            <ion-button fill="clear" slot="end" (click)="viewMore(item)">
-              <ion-icon name="arrow-forward"></ion-icon>
-            </ion-button>
             <ion-spinner *ngIf="isLoading && loadingItem === item" name="lines"></ion-spinner>
             <span *ngIf="isLoaded && loadedItem === item">
-              {{ item.population?.value === 0 ? 'Not Found' : item.population?.value?.toLocaleString() }}
+              : {{ item.population?.value === 0 ? 'Not Found' : item.population?.value?.toLocaleString() }}
             </span>
           </div>
         </ion-item>
