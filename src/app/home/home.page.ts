@@ -81,9 +81,7 @@ export class HomePage {
 
   private loadFavourites() {
     const storedFavourites = localStorage.getItem('favourites');
-    if (storedFavourites) {
-      this.favourites = JSON.parse(storedFavourites);
-    }
+    this.favourites = JSON.parse(storedFavourites ?? '[]');
   }
 
   private groupCountries(): void {
