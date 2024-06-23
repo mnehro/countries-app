@@ -69,21 +69,18 @@ export class HomePage {
   }
   
   private loadFavourites() {
-    const storedFavourites = localStorage.getItem('favourites');
+    const storedFavourites = localStorage.getItem('favourites');    
     if (storedFavourites) {
       this.favourites = JSON.parse(storedFavourites);
     }
   }
 
   private groupCountries(): void {
+    this.groupedCountries = {};
     this.countries.forEach(country => {
       const letter = country.name.charAt(0).toUpperCase();
-      if (!this.groupedCountries[letter]) {
-        this.groupedCountries[letter] = [];
-      }
-      if (country.iso3 !== 'ISR') {
-        this.groupedCountries[letter].push(country);
-      }
+      this.groupedCountries[letter] = this.groupedCountries[letter] || [];
+      country.iso3 !== 'ISR' && this.groupedCountries[letter].push(country);
     });
   }
 
@@ -98,7 +95,7 @@ export class HomePage {
     this.loadingItem = null;
   }
 
-  private addToFavorites(item: Country): void {
+  private addToFavorites(item: Country): void {  
     if (!this.favourites.includes(item))
       this.favourites.push(item);
   }
@@ -109,7 +106,6 @@ export class HomePage {
 
   private updateView(): void {
     if (!this.isHomePage) {
-      this.groupedCountries = {};
       this.countries = this.favourites;
       this.groupCountries();
       this.createLetters();
@@ -121,7 +117,6 @@ export class HomePage {
   filterCountries(searchBarValue: string | undefined | null): void {
     const query = searchBarValue?.toLowerCase().trim();
     if (query && query !== '') {
-      this.groupedCountries = {};
       this.countries = this.isHomePage ? this.baseCountries.filter(country => country.name.toLowerCase().indexOf(query) > -1)
         : this.favourites.filter(country => country.name.toLowerCase().indexOf(query) > -1);
       this.groupCountries();
