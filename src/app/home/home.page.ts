@@ -117,13 +117,18 @@ export class HomePage {
   }
 
   private updateView(): void {
-    if (!this.isHomePage) {
-      this.countries = this.favourites;
-      this.groupCountries();
-      this.createLetters();
-    } else {
-      this.groupedCountries = this.baseBackupGroupedCountries;
-    }
+    this.groupedCountries = !this.isHomePage
+      ? {
+        ...this.baseBackupGroupedCountries,
+      }
+      : {};
+
+    this.countries = this.isHomePage
+      ? [...this.baseCountries]
+      : [...this.favourites];
+
+    this.groupCountries();
+    this.createLetters();
   }
 
   filterCountries(searchBarValue: string | undefined | null): void {
