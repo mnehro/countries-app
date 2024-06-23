@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Country } from 'src/app/models/country.model';
 import { IonicModule } from '@ionic/angular';
 import { NgIf } from '@angular/common';
@@ -11,7 +11,7 @@ import { NgIf } from '@angular/common';
   imports: [IonicModule, NgIf]
 })
 
-export class CountryDetailsComponent   {
+export class CountryDetailsComponent {
   @Input() item: Country | undefined;
   @Input() isLoading: boolean = false;
   @Input() loadingItem: Country | null = null;

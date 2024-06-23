@@ -24,21 +24,13 @@
         <ion-label> {{letter}} </ion-label>
       </ion-item-divider>
       <ion-item-sliding *ngFor="let item of groupedCountries[letter]" (ionSwipe)="onItemDrag($event, item)">
-        <ion-item-options side="start">
-          <ion-item-option>
-            <ion-icon slot="icon-only" [name]="favourites.includes(item)? 'heart' : 'heart-outline'"
-              color="success"></ion-icon>
-            <span class="toggle-fav"> {{favourites.includes(item) ? 'Added!' : 'Not in favorite' }} </span>
-          </ion-item-option>
-        </ion-item-options>
 
-        <ion-item-options side="end">
-          <ion-item-option>
-            <ion-icon slot="icon-only" [name]="favourites.includes(item) ? 'trash-outline': 'trash'"
-              color="danger"></ion-icon>
-            <span class="toggle-fav">{{favourites.includes(item) ? 'In favorite' : 'Removed!'}} </span>
-          </ion-item-option>
-        </ion-item-options>
+
+        <slide-favorite [side]="'start'" [name]="favourites.includes(item)? 'heart' : 'heart-outline'"
+          [color]="'success'" [message]="favourites.includes(item) ? 'Added!' : 'Not in favorite' "></slide-favorite>
+
+        <slide-favorite [side]="'end'" [name]="favourites.includes(item) ? 'trash-outline': 'trash'"
+          [color]="'danger'" [message]="favourites.includes(item) ? 'In favorite' : 'Removed!'"></slide-favorite>
 
         <ion-item (click)="viewMore(item)">
           <ion-avatar slot="start">

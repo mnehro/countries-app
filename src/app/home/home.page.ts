@@ -9,6 +9,7 @@ import { catchError, debounceTime, tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { Constants } from '../models/enums.model';
 import { CountryDetailsComponent } from '../components/country-details/country-details.component';
+import { SlideFavoriteComponent } from '../components/slide-favorite/slide-favorite.component';
 
 addIcons({
   'heart': heart,
@@ -22,7 +23,7 @@ addIcons({
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, CountryDetailsComponent]
+  imports: [IonicModule, CommonModule, CountryDetailsComponent, SlideFavoriteComponent]
 })
 export class HomePage {
   @ViewChild('searchBar', { static: false }) searchBar!: IonSearchbar;
