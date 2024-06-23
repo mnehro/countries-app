@@ -7,6 +7,7 @@ import { CountryService } from '../services/country.service';
 import { Country, GroupedCountry } from '../models/country.model';
 import { catchError, tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import { Constants } from '../models/enums.model';
 
 addIcons({
   'heart': heart,
@@ -157,7 +158,7 @@ export class HomePage {
   }
 
   onImageError(event: any): void {
-    event.target.src = 'assets/default-flag.png';
+    event.target.src = Constants.defaultImage;
   }
 
   onItemDrag(event: any, item: Country): void {
