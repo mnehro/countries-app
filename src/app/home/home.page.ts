@@ -20,7 +20,7 @@ addIcons({
   standalone: true,
   imports: [IonicModule, CommonModule]
 })
-export class HomePage implements OnInit {
+export class HomePage {
   @ViewChild('searchBar', { static: false }) searchBar!: IonSearchbar;
 
   letters: string[] = [];
@@ -41,7 +41,7 @@ export class HomePage implements OnInit {
 
   constructor(private countryService: CountryService) { }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     this.loadCountries();
     this.loadFavourites();
   }
