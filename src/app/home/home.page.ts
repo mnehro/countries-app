@@ -98,10 +98,12 @@ export class HomePage {
   }
 
   private updatedLoadingState(item: Country): void {
-    this.isLoaded = true;
-    this.isLoading = false;
-    this.loadedItem = item;
-    this.loadingItem = null;
+    Object.assign(this, {
+      isLoaded: true,
+      isLoading: false,
+      loadedItem: item,
+      loadingItem: null
+    });
   }
 
   private addToFavorites(item: Country): void {
@@ -124,7 +126,7 @@ export class HomePage {
   }
 
   filterCountries(searchBarValue: string | undefined | null): void {
-    const query = (searchBarValue ?? '').toLowerCase().trim();    
+    const query = (searchBarValue ?? '').toLowerCase().trim();
     this.countries = this.isHomePage ? this.baseCountries.filter(country => country.name.toLowerCase().indexOf(query) > -1)
       : this.favourites.filter(country => country.name.toLowerCase().indexOf(query) > -1);
     this.groupCountries();
