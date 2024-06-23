@@ -39,7 +39,7 @@
 
         <ion-item (click)="viewMore(item)">
           <ion-avatar slot="start">
-            <img [src]="item.flag" (error)="onImageError($event)" />
+            <ion-img [src]="item?.flag" (ionError)="onImageError($event)"></ion-img>
           </ion-avatar>
           <div class="country-details">
             <ion-label class="country-name"> {{item.name}} </ion-label>
