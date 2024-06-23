@@ -42,7 +42,7 @@
             <ion-img [src]="item?.flag" (ionError)="onImageError($event)"></ion-img>
           </ion-avatar>
           <div class="country-details">
-            <ion-label class="country-name"> {{item.name}} </ion-label>
+            <ion-label class="country-name"> {{item?.name}} </ion-label>
             <ion-spinner *ngIf="isLoading && loadingItem === item" name="lines"></ion-spinner>
             <span *ngIf="isLoaded && loadedItem === item">
               : {{ item.population?.value === 0 ? 'Not Found' : item.population?.value?.toLocaleString() }}
