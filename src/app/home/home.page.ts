@@ -68,9 +68,9 @@ export class HomePage {
     console.error('Error loading countries:', error);
     return of(null);
   }
-  
+
   private loadFavourites() {
-    const storedFavourites = localStorage.getItem('favourites');    
+    const storedFavourites = localStorage.getItem('favourites');
     if (storedFavourites) {
       this.favourites = JSON.parse(storedFavourites);
     }
@@ -96,7 +96,7 @@ export class HomePage {
     this.loadingItem = null;
   }
 
-  private addToFavorites(item: Country): void {  
+  private addToFavorites(item: Country): void {
     if (!this.favourites.includes(item))
       this.favourites.push(item);
   }
@@ -137,25 +137,31 @@ export class HomePage {
     this.isLoading = true;
 
     const cachedData = localStorage.getItem(`population_${item.iso3}`);
-    if (cachedData) {
-      item.population = JSON.parse(cachedData);
-      this.updatedLoadingState(item);
-    } else {
-      this.countryService.getSingleCountryPopulation(item.iso3).subscribe({
-        next: (result) => {
-          if (!result.error) {
-            item.population = result.data.populationCounts?.slice(-1)[0];
-            localStorage.setItem(`population_${item.iso3}`, JSON.stringify(result.data.populationCounts?.slice(-1)[0]));
-            this.updatedLoadingState(item);
-          }
-        },
-        error: () => {
-          item.population = { value: 0 };
-          this.updatedLoadingState(item);
-        }
-      });
-    }
+    cachedData ? this.handleCachedPopulation(item, cachedData) : this.fetchPopulation(item);
   }
+  private handleCachedPopulation(item: Country, cachedData: string): void {
+    item.population = JSON.parse(cachedData);
+    this.updatedLoadingState(item);
+  }
+  private fetchPopulation(item: Country): void {
+    this.countryService.getSingleCountryPopulation(item.iso3).subscribe({
+      next: (result) => {
+        if (!result.error) {
+          const latestPopulation = result.data.populationCounts?.slice(-1)[0];
+          item.population = latestPopulation;
+          localStorage.setItem(`population_${item.iso3}`, JSON.stringify(latestPopulation));
+        } else {
+          item.population = { value: 0 };
+        }
+        this.updatedLoadingState(item);
+      },
+      error: () => {
+        item.population = { value: 0 };
+        this.updatedLoadingState(item);
+      }
+    });
+  }
+
 
   onImageError(event: any): void {
     event.target.src = Constants.defaultImage;
