@@ -5,7 +5,7 @@ import { addIcons } from 'ionicons';
 import { arrowForward, heart, heartOutline, trash, trashOutline } from 'ionicons/icons';
 import { CountryService } from '../services/country.service';
 import { Country, GroupedCountry } from '../models/country.model';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, debounceTime, tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { Constants } from '../models/enums.model';
 
@@ -45,8 +45,18 @@ export class HomePage {
   constructor(private countryService: CountryService) { }
 
   ngAfterViewInit(): void {
+    this.prepareSearchDenounce();
     this.loadCountries();
     this.loadFavourites();
+  }
+  private prepareSearchDenounce(): void {
+    this.searchBar.ionInput
+      .pipe(
+        debounceTime(300)
+      )
+      .subscribe(event => {
+        this.filterCountries((event.target as HTMLInputElement).value);
+      });
   }
 
   private loadCountries(): void {
