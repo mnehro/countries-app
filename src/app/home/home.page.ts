@@ -188,9 +188,6 @@ export class HomePage {
   }
 
   scrollToLetter(letter: string): void {
-    const el = document.getElementById(letter);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
+    document.getElementById(letter)?.scrollIntoView({ behavior: 'smooth' });
   }
 }
