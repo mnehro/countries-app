@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { IonicModule, IonSearchbar } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowForward, heart, heartOutline, trash, trashOutline } from 'ionicons/icons';
