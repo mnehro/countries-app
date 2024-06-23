@@ -5,6 +5,8 @@ import { addIcons } from 'ionicons';
 import { arrowForward, heart, heartOutline, trash, trashOutline } from 'ionicons/icons';
 import { CountryService } from '../services/country.service';
 import { Country, GroupedCountry } from '../models/country.model';
+import { catchError, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 addIcons({
   'heart': heart,
@@ -47,17 +49,25 @@ export class HomePage {
   }
 
   private loadCountries(): void {
-    this.countryService.getCountries().subscribe(result => {
-      if (!result.error) {
-        this.countries = result.data;
-        this.baseCountries = result.data;
-        this.groupCountries();
-        this.createLetters();
-        this.baseBackupGroupedCountries = { ...this.groupedCountries };
-      }
-    });
+    this.countryService.getCountries().pipe(
+      catchError(error => this.handleError(error)),
+      tap(result => {
+        if (result && !result.error) {
+          this.countries = result.data;
+          this.baseCountries = result.data;
+          this.groupCountries();
+          this.createLetters();
+          this.baseBackupGroupedCountries = { ...this.groupedCountries };
+        }
+      })
+    ).subscribe();
   }
 
+  private handleError(error: any): Observable<any> {
+    console.error('Error loading countries:', error);
+    return of(null);
+  }
+  
   private loadFavourites() {
     const storedFavourites = localStorage.getItem('favourites');
     if (storedFavourites) {
