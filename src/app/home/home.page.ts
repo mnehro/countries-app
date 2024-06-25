@@ -68,22 +68,25 @@ export class HomePage {
     return new Promise((resolve, reject) => {
       this.countryService.getCountries().pipe(
         catchError(async (error) => {
-          this.handleError(error);
           reject(error);
+          this.handleError(error);
         }),
         tap(result => {
           if (result && !result.error) {
-            this.countries = result.data;
-            this.baseCountries = result.data;
-            this.groupCountries();
-            this.createLetters();
-            this.baseBackupGroupedCountries = { ...this.groupedCountries };
+            this.handleLoadCountriesSuccess(result.data);
             resolve();
           }
         })
       ).subscribe();
     });
 
+  }
+  private handleLoadCountriesSuccess(data: Country[]): void {
+    this.countries = data;
+    this.baseCountries = data;
+    this.groupCountries();
+    this.createLetters();
+    this.baseBackupGroupedCountries = { ...this.groupedCountries };
   }
 
   private handleError(error: any): Observable<any> {
