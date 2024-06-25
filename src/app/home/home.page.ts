@@ -47,33 +47,43 @@ export class HomePage {
   constructor(private countryService: CountryService) { }
 
   ngAfterViewInit(): void {
-    this.prepareSearchDenounce();
-    this.loadCountries();
-    this.loadFavourites();
+    Promise.all([this.prepareSearchDenounce(), this.loadCountries(), this.loadFavourites()]).catch((error) => {
+      this.handleError(error);
+    })
   }
-  private prepareSearchDenounce(): void {
-    this.searchBar.ionInput
-      .pipe(
-        debounceTime(300)
-      )
-      .subscribe(event => {
-        this.filterCountries((event.target as HTMLInputElement).value);
-      });
+  private prepareSearchDenounce(): Promise<void> {
+    return new Promise((resolve) => {
+      this.searchBar.ionInput
+        .pipe(
+          debounceTime(300)
+        )
+        .subscribe(event => {
+          this.filterCountries((event.target as HTMLInputElement).value);
+        });
+      resolve();
+    });
   }
 
-  private loadCountries(): void {
-    this.countryService.getCountries().pipe(
-      catchError(error => this.handleError(error)),
-      tap(result => {
-        if (result && !result.error) {
-          this.countries = result.data;
-          this.baseCountries = result.data;
-          this.groupCountries();
-          this.createLetters();
-          this.baseBackupGroupedCountries = { ...this.groupedCountries };
-        }
-      })
-    ).subscribe();
+  private loadCountries(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.countryService.getCountries().pipe(
+        catchError(async (error) => {
+          this.handleError(error);
+          reject(error);
+        }),
+        tap(result => {
+          if (result && !result.error) {
+            this.countries = result.data;
+            this.baseCountries = result.data;
+            this.groupCountries();
+            this.createLetters();
+            this.baseBackupGroupedCountries = { ...this.groupedCountries };
+            resolve();
+          }
+        })
+      ).subscribe();
+    });
+
   }
 
   private handleError(error: any): Observable<any> {
@@ -81,9 +91,12 @@ export class HomePage {
     return of(null);
   }
 
-  private loadFavourites() {
-    const storedFavourites = localStorage.getItem('favourites');
-    this.favourites = JSON.parse(storedFavourites ?? '[]');
+  private loadFavourites(): Promise<void> {
+    return new Promise((resolve) => {
+      const storedFavourites = localStorage.getItem('favourites');
+      this.favourites = JSON.parse(storedFavourites ?? '[]');
+      resolve();
+    });
   }
 
   private groupCountries(): void {
