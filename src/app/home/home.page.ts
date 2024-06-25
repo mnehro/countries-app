@@ -214,6 +214,6 @@ export class HomePage implements OnDestroy {
   }
 
   scrollToLetter(letter: string): void {
-    document.getElementById(letter)?.scrollIntoView({ behavior: 'smooth' });
+    (document.getElementById(letter) as HTMLElement)?.scrollIntoView({ behavior: 'smooth' });
   }
 }
