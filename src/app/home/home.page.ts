@@ -56,7 +56,6 @@ export class HomePage implements OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
-
   private loadCountries(): Promise<void> {
     return new Promise((resolve, reject) => {
       const sub = this.countryService.getCountries().pipe(
@@ -76,8 +75,8 @@ export class HomePage implements OnDestroy {
 
   }
   private handleLoadCountriesSuccess(data: Country[]): void {
-    this.countries = data;
     this.baseCountries = data;
+    this.countries = data.slice(0, 30);
     this.groupCountries();
     this.createLetters();
     this.baseBackupGroupedCountries = { ...this.groupedCountries };
@@ -215,5 +214,28 @@ export class HomePage implements OnDestroy {
 
   scrollToLetter(letter: string): void {
     (document.getElementById(letter) as HTMLElement)?.scrollIntoView({ behavior: 'smooth' });
+  }
+  loadMore(event: any): void {
+    setTimeout(() => {
+      const query = (this.searchBar?.value ?? '').toLowerCase().trim();
+
+      const startIndex = this.countries.length;
+      const endIndex = startIndex + 10;
+
+      let additionalCountries = this.isHomePage
+        ? this.baseCountries.filter(country => country.name.toLowerCase().includes(query))
+        : this.baseCountries.filter(country => this.favourites.has(country.iso3) && country.name.toLowerCase().includes(query));
+
+      additionalCountries = additionalCountries.slice(startIndex, endIndex);
+      this.countries = [...this.countries, ...additionalCountries];
+      this.groupCountries();
+      this.createLetters();
+      
+      event.target.complete();
+
+      if (this.countries.length >= this.baseCountries.length) {
+        event.target.disabled = true;
+      }
+    }, 500);
   }
 }
