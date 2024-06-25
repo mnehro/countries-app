@@ -5,7 +5,7 @@
 
   <ion-toolbar>
     <ion-searchbar #searchBar animated="true" placeholder="Search"
-      (ionInput)="filterCountries($event.target.value)"></ion-searchbar>
+      (ionInput)="filterCountries($event.target.value)" debounce="300"></ion-searchbar>
     <ion-buttons slot="start">
       <ion-button (click)="toggleView()">
 

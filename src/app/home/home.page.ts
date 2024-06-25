@@ -5,7 +5,7 @@ import { addIcons } from 'ionicons';
 import { arrowForward, heart, heartOutline, trash, trashOutline } from 'ionicons/icons';
 import { CountryService } from '../services/country.service';
 import { Country, GroupedCountry } from '../models/country.model';
-import { catchError, debounceTime, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { Observable, of, Subscription } from 'rxjs';
 import { Constants } from '../models/enums.model';
 import { CountryDetailsComponent } from '../components/country-details/country-details.component';
@@ -49,26 +49,12 @@ export class HomePage implements OnDestroy {
   constructor(private countryService: CountryService) { }
 
   ngAfterViewInit(): void {
-    Promise.all([this.prepareSearchDenounce(), this.loadCountries(), this.loadFavourites()]).catch((error) => {
+    Promise.all([this.loadCountries(), this.loadFavourites()]).catch((error) => {
       this.handleError(error);
     })
   }
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
-  private prepareSearchDenounce(): Promise<void> {
-    return new Promise((resolve) => {
-      const sub = this.searchBar.ionInput
-        .pipe(
-          debounceTime(300)
-        )
-        .subscribe(event => {
-          this.filterCountries((event.target as HTMLInputElement).value);
-        });
-      this.subscriptions.push(sub);
-
-      resolve();
-    });
   }
 
   private loadCountries(): Promise<void> {
