@@ -107,7 +107,7 @@ export class HomePage {
     this.countries.forEach(country => {
       const letter = country.name.charAt(0).toUpperCase();
       this.groupedCountries[letter] = this.groupedCountries[letter] || [];
-      country.iso3 !== 'ISR' && this.groupedCountries[letter].push(country);
+      country.iso3 !== Constants.ISR && this.groupedCountries[letter].push(country);
     });
   }
 
