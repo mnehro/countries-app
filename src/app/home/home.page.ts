@@ -96,8 +96,7 @@ export class HomePage {
 
   private loadFavourites(): Promise<void> {
     return new Promise((resolve) => {
-      const storedFavourites = localStorage.getItem('favourites');
-      this.favourites = JSON.parse(storedFavourites ?? '[]');
+      this.favourites = JSON.parse(localStorage.getItem('favourites') ?? '[]');
       resolve();
     });
   }
@@ -125,11 +124,15 @@ export class HomePage {
   }
 
   private addToFavorites(item: Country): void {
-    !this.favourites.includes(item) && this.favourites.push(item);
+    !this.favourites.some(fav => fav.iso3 === item.iso3) && this.favourites.push(item);
+  }
+  
+  favIncludesItem(item : Country) : boolean {
+    return this.favourites.some(fav => fav.iso3 === item.iso3);
   }
 
   private removeFromFavorites(item: Country): void {
-    this.favourites = this.favourites.filter(c => c !== item);
+    this.favourites = this.favourites.filter(c => c.iso3 !== item.iso3);
   }
 
   private updateView(): void {
