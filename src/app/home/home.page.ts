@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { IonicModule, IonSearchbar } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowForward, heart, heartOutline, trash, trashOutline } from 'ionicons/icons';
 import { CountryService } from '../services/country.service';
 import { Country, GroupedCountry } from '../models/country.model';
 import { catchError, debounceTime, tap } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { Constants } from '../models/enums.model';
 import { CountryDetailsComponent } from '../components/country-details/country-details.component';
 import { SlideFavoriteComponent } from '../components/slide-favorite/slide-favorite.component';
@@ -25,7 +25,7 @@ addIcons({
   standalone: true,
   imports: [IonicModule, CommonModule, CountryDetailsComponent, SlideFavoriteComponent]
 })
-export class HomePage {
+export class HomePage implements OnDestroy {
   @ViewChild('searchBar', { static: false }) searchBar!: IonSearchbar;
 
   letters: string[] = [];
@@ -44,6 +44,8 @@ export class HomePage {
   loadingItem: Country | null = null;
   loadedItem: Country | null = null;
 
+  private subscriptions: Subscription[] = [];
+
   constructor(private countryService: CountryService) { }
 
   ngAfterViewInit(): void {
@@ -51,22 +53,27 @@ export class HomePage {
       this.handleError(error);
     })
   }
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
   private prepareSearchDenounce(): Promise<void> {
     return new Promise((resolve) => {
-      this.searchBar.ionInput
+      const sub = this.searchBar.ionInput
         .pipe(
           debounceTime(300)
         )
         .subscribe(event => {
           this.filterCountries((event.target as HTMLInputElement).value);
         });
+      this.subscriptions.push(sub);
+
       resolve();
     });
   }
 
   private loadCountries(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.countryService.getCountries().pipe(
+      const sub = this.countryService.getCountries().pipe(
         catchError(async (error) => {
           reject(error);
           this.handleError(error);
@@ -78,6 +85,7 @@ export class HomePage {
           }
         })
       ).subscribe();
+      this.subscriptions.push(sub);
     });
 
   }
@@ -144,8 +152,8 @@ export class HomePage {
       : {};
 
     this.countries = this.isHomePage
-    ? [...this.baseCountries]
-    : this.baseCountries.filter(country => this.favourites.has(country.iso3));
+      ? [...this.baseCountries]
+      : this.baseCountries.filter(country => this.favourites.has(country.iso3));
 
     this.groupCountries();
     this.createLetters();
@@ -177,22 +185,28 @@ export class HomePage {
     this.updatedLoadingState(item);
   }
   private fetchPopulation(item: Country): void {
-    this.countryService.getSingleCountryPopulation(item.iso3).subscribe({
+    const sub = this.countryService.getSingleCountryPopulation(item.iso3).subscribe({
       next: (result) => {
         if (!result.error) {
           const latestPopulation = result.data.populationCounts?.slice(-1)[0];
           item.population = latestPopulation;
           localStorage.setItem(`population_${item.iso3}`, JSON.stringify(latestPopulation));
-        } else {
-          item.population = { value: 0 };
         }
         this.updatedLoadingState(item);
       },
       error: () => {
         item.population = { value: 0 };
         this.updatedLoadingState(item);
+      },
+      complete: () => {
+        if (!item.population) {
+          item.population = { value: 0 };
+        }
+        this.updatedLoadingState(item);
       }
     });
+    this.subscriptions.push(sub);
+
   }
 
 
