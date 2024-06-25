@@ -32,7 +32,7 @@ export class HomePage {
 
   countries: Country[] = [];
   baseCountries: Country[] = [];
-  favourites: Country[] = [];
+  favourites: Set<string> = new Set();
 
   groupedCountries: GroupedCountry = {};
   baseBackupGroupedCountries: GroupedCountry = {};
@@ -96,7 +96,8 @@ export class HomePage {
 
   private loadFavourites(): Promise<void> {
     return new Promise((resolve) => {
-      this.favourites = JSON.parse(localStorage.getItem('favourites') ?? '[]');
+      const favouritesArray: string[] = JSON.parse(localStorage.getItem('favourites') ?? '[]');
+      this.favourites = new Set(favouritesArray);
       resolve();
     });
   }
@@ -124,15 +125,15 @@ export class HomePage {
   }
 
   private addToFavorites(item: Country): void {
-    !this.favourites.some(fav => fav.iso3 === item.iso3) && this.favourites.push(item);
+    this.favourites.add(item.iso3);
   }
-  
-  favIncludesItem(item : Country) : boolean {
-    return this.favourites.some(fav => fav.iso3 === item.iso3);
+
+  favIncludesItem(item: Country): boolean {
+    return this.favourites.has(item.iso3);
   }
 
   private removeFromFavorites(item: Country): void {
-    this.favourites = this.favourites.filter(c => c.iso3 !== item.iso3);
+    this.favourites.delete(item.iso3);
   }
 
   private updateView(): void {
@@ -143,8 +144,8 @@ export class HomePage {
       : {};
 
     this.countries = this.isHomePage
-      ? [...this.baseCountries]
-      : [...this.favourites];
+    ? [...this.baseCountries]
+    : this.baseCountries.filter(country => this.favourites.has(country.iso3));
 
     this.groupCountries();
     this.createLetters();
@@ -152,8 +153,9 @@ export class HomePage {
 
   filterCountries(searchBarValue: string | undefined | null): void {
     const query = (searchBarValue ?? '').toLowerCase().trim();
-    this.countries = this.isHomePage ? this.baseCountries.filter(country => country.name.toLowerCase().indexOf(query) > -1)
-      : this.favourites.filter(country => country.name.toLowerCase().indexOf(query) > -1);
+    this.countries = this.isHomePage
+      ? this.baseCountries.filter(country => country.name.toLowerCase().includes(query))
+      : this.baseCountries.filter(country => this.favourites.has(country.iso3) && country.name.toLowerCase().includes(query));
     this.groupCountries();
     this.createLetters();
   }
@@ -207,7 +209,8 @@ export class HomePage {
       this.addToFavorites(item);
     }
     this.filterCountries(this.searchBar.value);
-    localStorage.setItem('favourites', JSON.stringify(this.favourites));
+    localStorage.setItem('favourites', JSON.stringify([...this.favourites]));
+
   }
 
   scrollToLetter(letter: string): void {

@@ -3,8 +3,8 @@ export type Country = {
     iso2: string;
     iso3: string;
     flag: string;
-    population?: PopulationCount,
-    populationCounts?: PopulationCount[]
+    population?: PopulationCount;
+    populationCounts?: PopulationCount[];
 };
 
 export type PopulationCount = {
