@@ -1,20 +1,62 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title>Countries App</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-searchbar #searchBar animated="true" placeholder="Search" (ionInput)="filterCountries($event.target.value)"
+      debounce="300"></ion-searchbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="toggleView()">
+
+        {{ isHomePage ? 'View Favorites' : 'View all' }}
+
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+<ion-content>
+  <ion-list>
+    <ion-item-group *ngFor="let letter of letters">
+      <ion-item-divider id="{{letter}}">
+        <ion-label> {{letter}} </ion-label>
+      </ion-item-divider>
+      <ion-item-sliding *ngFor="let item of groupedCountries[letter]" (ionSwipe)="onItemDrag($event, item)">
+
+
+        <slide-favorite [side]="'start'" [name]="favIncludesItem(item)? 'heart' : 'heart-outline'" [color]="'success'"
+          [message]="favIncludesItem(item) ? 'Added!' : 'Not in favorite' "></slide-favorite>
+
+        <slide-favorite [side]="'end'" [name]="favIncludesItem(item) ? 'trash-outline': 'trash'" [color]="'danger'"
+          [message]="favIncludesItem(item) ? 'In favorite' : 'Removed!'"></slide-favorite>
+
+        <ion-item (click)="viewMore(item)">
+          <ion-avatar slot="start">
+            <ion-img [src]="item?.flag" (ionError)="onImageError($event)"></ion-img>
+          </ion-avatar>
+          <country-details [item]="item" [isLoading]="isLoading" [loadingItem]="loadingItem" [isLoaded]="isLoaded"
+            [loadedItem]="loadedItem">
+          </country-details>
+
+        </ion-item>
+      </ion-item-sliding>
+    </ion-item-group>
+  </ion-list>
+
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles"
+      loadingText="Loading more data..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+
+  <div class="letter-nav">
+    <ion-list>
+      <ion-item *ngFor="let letter of letters" (click)="scrollToLetter(letter)">
+        <ion-label>{{ letter }}</ion-label>
+      </ion-item>
+    </ion-list>
   </div>
+
 </ion-content>
