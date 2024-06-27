@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { IonicModule, IonSearchbar } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowForward, heart, heartOutline, trash, trashOutline } from 'ionicons/icons';
 import { CountryService } from '../services/country.service';
 import { Country, GroupedCountry } from '../models/country.model';
-import { catchError, tap } from 'rxjs/operators';
-import { Observable, of, Subscription } from 'rxjs';
+import { catchError, finalize, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 import { Constants } from '../models/enums.model';
 import { CountryDetailsComponent } from '../components/country-details/country-details.component';
 import { SlideFavoriteComponent } from '../components/slide-favorite/slide-favorite.component';
@@ -25,7 +25,7 @@ addIcons({
   standalone: true,
   imports: [IonicModule, CommonModule, CountryDetailsComponent, SlideFavoriteComponent]
 })
-export class HomePage implements OnDestroy {
+export class HomePage {
   @ViewChild('searchBar', { static: false }) searchBar!: IonSearchbar;
 
   letters: string[] = [];
@@ -44,8 +44,6 @@ export class HomePage implements OnDestroy {
   loadingItem: Country | null = null;
   loadedItem: Country | null = null;
 
-  private subscriptions: Subscription[] = [];
-
   constructor(private countryService: CountryService) { }
 
   ngAfterViewInit(): void {
@@ -53,9 +51,7 @@ export class HomePage implements OnDestroy {
       this.handleError(error);
     })
   }
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
+
   private loadCountries(): void {
     this.countryService.getCountries().pipe(
       catchError(error => this.handleError(error)),
@@ -63,6 +59,8 @@ export class HomePage implements OnDestroy {
         if (result && !result.error) {
           this.handleLoadCountriesSuccess(result.data);
         }
+      }), finalize(() => {
+        console.log('Subscribtion finished');
       })
     ).subscribe();
   }
@@ -161,28 +159,27 @@ export class HomePage implements OnDestroy {
     this.updatedLoadingState(item);
   }
   private fetchPopulation(item: Country): void {
-    const sub = this.countryService.getSingleCountryPopulation(item.iso3).subscribe({
-      next: (result) => {
+    this.countryService.getSingleCountryPopulation(item.iso3).pipe(
+      tap(result => {
         if (!result.error) {
           const latestPopulation = result.data.populationCounts?.slice(-1)[0];
           item.population = latestPopulation;
           localStorage.setItem(`population_${item.iso3}`, JSON.stringify(latestPopulation));
+        } else {
+          item.population = { value: 0 };
         }
-        this.updatedLoadingState(item);
-      },
-      error: () => {
+      }),
+      catchError(() => {
         item.population = { value: 0 };
-        this.updatedLoadingState(item);
-      },
-      complete: () => {
+        return of(null);
+      }),
+      finalize(() => {
         if (!item.population) {
           item.population = { value: 0 };
         }
         this.updatedLoadingState(item);
-      }
-    });
-    this.subscriptions.push(sub);
-
+      })
+    ).subscribe();
   }
 
 
