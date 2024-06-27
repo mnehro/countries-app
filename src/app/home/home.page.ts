@@ -56,23 +56,17 @@ export class HomePage implements OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
-  private loadCountries(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const sub = this.countryService.getCountries().pipe(
-        catchError(async (error) => {
-          reject(error);
-          this.handleError(error);
-        }),
-        tap(result => {
-          if (result && !result.error) {
-            this.handleLoadCountriesSuccess(result.data);
-            resolve();
-          }
-        })
-      ).subscribe();
-      this.subscriptions.push(sub);
-    });
-
+  private loadCountries(): void {
+    this.countryService.getCountries().pipe(
+      catchError(async (error) => {
+        this.handleError(error);
+      }),
+      tap(result => {
+        if (result && !result.error) {
+          this.handleLoadCountriesSuccess(result.data);
+        }
+      })
+    );
   }
   private handleLoadCountriesSuccess(data: Country[]): void {
     this.baseCountries = data;
@@ -230,7 +224,7 @@ export class HomePage implements OnDestroy {
       this.countries = [...this.countries, ...additionalCountries];
       this.groupCountries();
       this.createLetters();
-      
+
       event.target.complete();
 
       if (this.countries.length >= this.baseCountries.length) {
