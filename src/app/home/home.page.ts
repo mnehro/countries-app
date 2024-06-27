@@ -58,17 +58,17 @@ export class HomePage implements OnDestroy {
   }
   private loadCountries(): void {
     this.countryService.getCountries().pipe(
-      catchError(async (error) => {
-        this.handleError(error);
-      }),
+      catchError(error => this.handleError(error)),
       tap(result => {
         if (result && !result.error) {
           this.handleLoadCountriesSuccess(result.data);
         }
       })
-    );
+    ).subscribe();
   }
   private handleLoadCountriesSuccess(data: Country[]): void {
+    console.log(data);
+
     this.baseCountries = data;
     this.countries = data.slice(0, 30);
     this.groupCountries();
@@ -82,10 +82,9 @@ export class HomePage implements OnDestroy {
   }
 
   private loadFavourites(): Promise<void> {
-    return new Promise((resolve) => {
+    return Promise.resolve().then(() => {
       const favouritesArray: string[] = JSON.parse(localStorage.getItem('favourites') ?? '[]');
       this.favourites = new Set(favouritesArray);
-      resolve();
     });
   }
 
