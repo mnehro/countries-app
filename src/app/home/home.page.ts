@@ -67,10 +67,8 @@ export class HomePage implements OnDestroy {
     ).subscribe();
   }
   private handleLoadCountriesSuccess(data: Country[]): void {
-    console.log(data);
-
-    this.baseCountries = data;
-    this.countries = data.slice(0, 30);
+    this.baseCountries = [...data];
+    this.countries = [...data.slice(0, 30)];
     this.groupCountries();
     this.createLetters();
     this.baseBackupGroupedCountries = { ...this.groupedCountries };
